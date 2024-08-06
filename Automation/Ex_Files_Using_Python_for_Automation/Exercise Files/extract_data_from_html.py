@@ -1,9 +1,10 @@
 # import all necessary libraries
 import requests 
+import pandas as pd
 from bs4 import BeautifulSoup 
 
 # define url of webpage to scrape from
-url = "https://www.feedbooks.com/search?cat=FBFIC016000&query=feedbooks"
+url = "https://books.toscrape.com"
 
 # send a request to get html code from the url and save the response 
 response = requests.get(url, headers={"Accept": "text/html"}) 
@@ -13,9 +14,27 @@ parsed_response = BeautifulSoup(response.text, "html.parser")
 
 # find all book titles 
 # uncomment the following line of code and FILL IN
-titles = parsed_response.find_all("a", class_="block__item-title")
+titles = parsed_response.find_all("h3")
+prices  = parsed_response.find_all("p", class_= "price_color")
 
-# iterate over the titles and print the text for each
-# write your code below
+# create lists to store the cleaned data
+cleaned_titles = []
+cleaned_prices = []
+
+# iterate over the titles and prices, and clean the text for each
 for title in titles:
-    print(title.text)
+    cleaned_text = ' '.join(title.a["title"].split())
+    cleaned_titles.append(cleaned_text)
+
+for price in prices:
+    cleaned_price = ' '.join(price.text.split())
+    cleaned_prices.append(cleaned_price)
+
+# create a DataFrame
+books_df = pd.DataFrame({
+    "Title": cleaned_titles,
+    "Price": cleaned_prices
+})
+
+# display the DataFrame
+print(books_df)
